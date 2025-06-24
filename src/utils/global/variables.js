@@ -1,0 +1,2 @@
+export const defaultSecureUrl = "https://res.cloudinary.com/dkufo7fyw/image/upload/v1739094224/default-avatar-profile-icon-of-social-media-user-photo-image-vector_y63qz8.jpg"
+export const defaultProfileId = "default-avatar-profile-icon-of-social-media-user-photo-image-vector_y63qz8"
