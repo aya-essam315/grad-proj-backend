@@ -60,7 +60,7 @@ export const deleteCourse = asyncHandler(async(req,res,next)=>{
 
 export const getCourse = asyncHandler(async(req,res,next)=>{
     const {courseId} = req.params;
-    const course = await CourseModel.findById(courseId)
+    const course = await CourseModel.findById(courseId).select("-contentStructure")
     if(!course) {
         return res.status(404).json({message: "Course not found"});
         }
