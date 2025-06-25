@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\":\"aya\",\r\n    \"lastName\":\"essam\",\r\n    \"email\":\"lasov51374@decodewp.com\",\r\n    \"role\":\"teacher\",\r\n    \"mobileNumber\":\"01027560904\",\r\n    \"password\":\"123AHJPO89wkw34\",\r\n    \"confirmPassword\":\"123AHJPO89wkw34\",\r\n    \"DOB\":\"2002-10-17\"\r\n  \r\n}",
+							"raw": "{\r\n    \"firstName\":\"aya\",\r\n    \"lastName\":\"essam\",\r\n    \"email\":\"lasov51374@decodewp.com\",\r\n    \"role\":\"teacher\",\r\n    \"gender\":\"male\",\r\n    \"password\":\"123AHJPO89wkw34\",\r\n    \"confirmPassword\":\"123AHJPO89wkw34\",\r\n    \"DOB\":\"2002-10-17\"\r\n  \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -45,7 +45,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\":\"user\",\r\n    \"lastName\":\"two\",\r\n    \"email\":\"xicinor479@kimdyn.com\",\r\n    \"role\":\"student\",\r\n    \"mobileNumber\":\"01027560904\",\r\n    \"password\":\"123AHJPO89wkw34\",\r\n    \"confirmPassword\":\"123AHJPO89wkw34\",\r\n    \"DOB\":\"2002-01-01\",\r\n    \"learningStyle\":[\"active\",\"Sensing\", \"visual\", \"logical\"]\r\n}",
+							"raw": "{\r\n    \"firstName\":\"user\",\r\n    \"lastName\":\"two\",\r\n    \"email\":\"6785tfhg@kimdyn.com\",\r\n    \"role\":\"student\",\r\n     \"gender\":\"female\",\r\n    \"password\":\"123AHJPO89wkw34\",\r\n    \"confirmPassword\":\"123AHJPO89wkw34\",\r\n    \"DOB\":\"2002-01-01\",\r\n    \"learningStyle\":[\"active\",\"Sensing\", \"visual\", \"logical\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

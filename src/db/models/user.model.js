@@ -14,7 +14,7 @@ const userSchema = new Schema({
     // provider:{type:String, enum: Object.values(systemEnums.provider)},
     gender:{type:String, enum: Object.values(systemEnums.gender)},
     DOB:{type:Date, max: new Date("2025-01-01")},
-    mobileNumber:{type:String},
+    // mobileNumber:{type:String},
     systemRole:{type:String, enum: Object.values(systemEnums.systemRoles), default:"user"},
     role:{type:String, enum: Object.values(systemEnums.roles), },
     isConfirmed:{type:Boolean, default:true},
@@ -65,42 +65,15 @@ userSchema.pre("save", function(next){
 
     }
       
-    if(this.isModified("mobileNumber")){
-        console.log(this.mobileNumber);
-        this.mobileNumber = CryptPhone({data:this.mobileNumber})
-        console.log(this.mobileNumber);
-        
-    }
+   
     
 // }
    
    return next()
 })
 
-userSchema.pre("findOneAndUpdate", function (next) {
-    let update = this.getUpdate();
-    // console.log(update);
-    
-  
-    if (update.mobileNumber) {
-      update.mobileNumber = CryptPhone({ data: update.mobileNumber });
-      this.setUpdate(update);
-    }
-  
-    next();
-  });
 
 
-userSchema.post("findOne", function (doc) {
-
-    
-    if (doc) {
-      if(doc.mobileNumber){
-        doc.mobileNumber = decryptData({data:doc.mobileNumber});
-
-      }
-    }
-  });
 
 
 
