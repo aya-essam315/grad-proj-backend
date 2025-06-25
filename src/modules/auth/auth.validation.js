@@ -12,7 +12,6 @@ export const signUpValidation = joi.object({
     gender: generlaFielsValidation.gender,
     // DOB: joi.date().min('1900-01-01').max('2025-03-02').required(),
     DOB: generlaFielsValidation.DOB,
-    mobileNumber:generlaFielsValidation.mobileNumber,
     systemRole: joi.string().valid(...Object.values(systemRoles)),
     role: joi.string().valid(...Object.values(roles)),
    learningStyle: joi.array().items(joi.string())
