@@ -14,7 +14,7 @@ export const bootStrap = async(app, express)=>{
 
 
 
-    app.use("*", (req,res,next)=>{
+    app.all("*", (req,res,next)=>{
         res.status(404).json({
             success: false,
             message: "Page not found"

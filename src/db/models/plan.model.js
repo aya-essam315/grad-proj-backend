@@ -6,7 +6,7 @@ const planSchema = new Schema({
       createdBy:{type:Types.ObjectId, ref:"User"},
     // syllabusId:{type: Types.ObjectId, ref:"Syllabus"},
     
-},{strict:false})
+},{strict:false, _id:true})
 
 
 export const PlanModel = model("Plan", planSchema)

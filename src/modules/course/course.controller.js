@@ -3,11 +3,14 @@ import * as courseServices from "./course.service.js"
 import {authentication} from "../../middleware/authentication.js"
 import { authorization } from "../../middleware/authorization.js";
 import { endpoint } from "./end.point.js";
+import { isValidate } from "../../middleware/validation/validation.js";
+import * as courseValidation from "./course.validation.js"
 const router = Router();
 
 router.post("/add-course", 
     authentication,
     authorization(endpoint.course),
+    isValidate(courseValidation.addCourseValidation),
     courseServices.addCourse)
 
 router.delete("/:courseId",
@@ -33,7 +36,7 @@ router.post("/createPlan/:courseId",
      authorization(endpoint.course),
      courseServices.createPlan)
 
-router.post("/savePlan/:courseId",
+router.put("/savePlan/:courseId",
        authentication,
        authorization(endpoint.course),
      courseServices.savePlan)
