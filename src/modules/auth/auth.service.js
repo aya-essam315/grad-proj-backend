@@ -16,9 +16,9 @@ export const signUp = asyncHandler(async (req,res,next) => {
     if(userExists){
         return next(new Error("User already exists", {cause:409}));
              }
-    const OTP = Randomstring.generate({length:6, charset:"alphanumeric"});
+    // const OTP = Randomstring.generate({length:6, charset:"alphanumeric"});
     
-    emailEvent.emit("sendEmail", {email, OTP, subject:"confirmation Email"});
+    // emailEvent.emit("sendEmail", {email, OTP, subject:"confirmation Email"});
     const createdUser = await UserModel.create({
        firstName,
        lastName,
@@ -27,48 +27,48 @@ export const signUp = asyncHandler(async (req,res,next) => {
        DOB,
        learningStyle,
        mobileNumber,
-         OTP:[
-            {
-                code: hashData({data:OTP}),
-                codeType:"confirmEmail",
-                expiresAt: new Date(Date.now() + 10 * 60 * 1000) 
-            }
+        //  OTP:[
+        //     {
+        //         code: hashData({data:OTP}),
+        //         codeType:"confirmEmail",
+        //         expiresAt: new Date(Date.now() + 10 * 60 * 1000) 
+        //     }
 
-            ], 
-            provider:"system"
+        //     ], 
+            // provider:"system"
     });
-      successResponse({res, message:"we sent otp confirmation code"})
+      successResponse({res, message:"done"})
 })
 
 
 
-export const confirmEmail = asyncHandler(async (req,res,next) => {
-    const {email, OTP} = req.body;
+// export const confirmEmail = asyncHandler(async (req,res,next) => {
+//     const {email, OTP} = req.body;
 
-    const user  = await UserModel.findOne({email});
-    if(!user){
-        return next(new Error("User not found", {cause:404}));
-    }
-    if(user.isConfirmed){
-        return next(new Error("Email already confirmed", {cause:409}));
-    }
-    const otp = user.OTP;
-    //get last otp has sent
-    const latestOtp = otp[otp.length-1];
-    // console.log(latestOtp);
-    if(latestOtp.expiresAt < Date.now()){
-        return next(new Error("OTP expired", {cause:401}));
-    }
-    if(!latestOtp.codeType == "confirmEmail")  return next(new Error("not allowed", {cause:401}));
+//     const user  = await UserModel.findOne({email});
+//     if(!user){
+//         return next(new Error("User not found", {cause:404}));
+//     }
+//     if(user.isConfirmed){
+//         return next(new Error("Email already confirmed", {cause:409}));
+//     }
+//     const otp = user.OTP;
+//     //get last otp has sent
+//     const latestOtp = otp[otp.length-1];
+//     // console.log(latestOtp);
+//     if(latestOtp.expiresAt < Date.now()){
+//         return next(new Error("OTP expired", {cause:401}));
+//     }
+//     if(!latestOtp.codeType == "confirmEmail")  return next(new Error("not allowed", {cause:401}));
 
-    if(!compareValues({data:OTP, hashedData: latestOtp.code})){
-        return next(new Error("Invalid OTP", {cause:401}));
-      }
-    user.isConfirmed = true;
-    await user.save();
-   successResponse({res, message:"Email confirmed successfully"})
+//     if(!compareValues({data:OTP, hashedData: latestOtp.code})){
+//         return next(new Error("Invalid OTP", {cause:401}));
+//       }
+//     user.isConfirmed = true;
+//     await user.save();
+//    successResponse({res, message:"Email confirmed successfully"})
     
-})
+// })
 
 
 

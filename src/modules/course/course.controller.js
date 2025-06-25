@@ -50,6 +50,12 @@ router.get("/",
      courseServices.getAllCourse)
 
 
+router.get("/syllabus/:courseId",
+     authentication,
+     authorization(endpoint.course),
+     courseServices.getSyllabus)
+
+
 router.get("/:id", courseServices.getCourse)
 
 

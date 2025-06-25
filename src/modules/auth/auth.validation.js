@@ -15,7 +15,7 @@ export const signUpValidation = joi.object({
     mobileNumber:generlaFielsValidation.mobileNumber,
     systemRole: joi.string().valid(...Object.values(systemRoles)),
     role: joi.string().valid(...Object.values(roles)),
-   learningStyle: joi.string()
+   learningStyle: joi.array().items(joi.string())
     .when("role", {
       is: "student",
       then: joi.required(),

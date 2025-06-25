@@ -146,7 +146,7 @@ export const saveSyllabus = asyncHandler(async (req,res,next)=>{
 
 
 export const deleteSyllabus = asyncHandler(async (req,res,next)=>{
-    const {syllabusId} = req.params;
+    const {courseId} = req.params;
     
     
         const deletedSyllabus = await SyllabusModel.findByIdAndDelete({
@@ -159,6 +159,27 @@ export const deleteSyllabus = asyncHandler(async (req,res,next)=>{
             successResponse({res, message:"Syllabus deleted successfully"})
         
 })
+
+
+
+export const getSyllabus = asyncHandler(async (req,res,next)=>{
+        const {courseId} = req.params;
+
+        const course = await CourseModel.findById(courseId,{createdBy: req.authUser._id});
+    if(!course){
+       successResponse(new Error("Course not found", {cause:404}))
+        }
+        const Syllabus = await SyllabusModel.findOne({
+              courseId,
+            //   createdBy: req.authUser._id
+        });
+        if(!Syllabus){
+            return next(new Error("no syllabus found"))
+            }
+            successResponse({res, message:"done", data:Syllabus})
+        
+})
+
 
 
 
