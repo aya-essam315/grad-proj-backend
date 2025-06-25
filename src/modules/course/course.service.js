@@ -60,11 +60,15 @@ export const deleteCourse = asyncHandler(async(req,res,next)=>{
 
 export const getCourse = asyncHandler(async(req,res,next)=>{
     const {courseId} = req.params;
-    const course = await CourseModel.findById(courseId).select("-contentStructure")
+    const course = await CourseModel.findById(courseId).select("courseCode courseName")
+    
     if(!course) {
         return res.status(404).json({message: "Course not found"});
         }
-        successResponse({res, message:"done", data: course})
+    const coursePlan = await PlanModel.findOne({courseId}).select("-createdBy")
+    console.log(coursePlan);
+     
+      successResponse({res, data:{course, coursePlan}})
 })
 
 
@@ -213,11 +217,7 @@ Each week includes **${lecsPerWeek} lectures**.
 ### Requirements:
 - Follow the syllabus exactly, in the same order.
 - For each week, list the **lecture names** and their corresponding **subtopics**.
-- Include **weekly assignments** (do not provide assignment details, just indicate they exist).
-- Include **quizzes** after major concepts to assess understanding.
-- Include a **Midterm Exam** in the middle of the course.
-- Include a **Final Exam** in the last week.
-- Suggest mini project based on the course content.
+
 ### Format:
 Return the response as **valid JSON**, using the following structure:
 json
@@ -226,10 +226,11 @@ json
     {
       "Week": 1,
       "LectureName": "Lecture Title",
-      "Subtopics": ["subtopic 1", "subtopic 2", "..."],
-      "Assignments": true,
-      "Exam": "none | midterm | final",
-      "ProjectTask": "Graduation project task"
+      "Subtopics":
+      ["subtopic 1",
+       "subtopic 2"
+       , "..."],
+    
     },
    
   ]
