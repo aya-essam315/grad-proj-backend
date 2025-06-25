@@ -1,6 +1,7 @@
 import joi from "joi";
 import { generlaFielsValidation } from "../../middleware/validation/validation.js";
 import { roles, systemRoles } from "../../utils/global/enums.js";
+
 export const signUpValidation = joi
   .object({
     firstName: generlaFielsValidation.firstName.required(),
@@ -9,7 +10,6 @@ export const signUpValidation = joi
     password: generlaFielsValidation.password.required(),
     confirmPassword: generlaFielsValidation.confirmPassword,
     gender: generlaFielsValidation.gender,
-    // DOB: joi.date().min('1900-01-01').max('2025-03-02').required(),
     DOB: generlaFielsValidation.DOB,
     mobileNumber: generlaFielsValidation.mobileNumber,
     systemRole: joi.string().valid(...Object.values(systemRoles)),

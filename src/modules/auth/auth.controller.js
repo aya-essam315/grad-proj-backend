@@ -12,9 +12,9 @@ router.post("/signup",
     isValidate(authValidators.signUpValidation),
     authServices.signUp)
 
-router.patch("/confirmEmail",
-     isValidate(authValidators.confirmEmail),
-     authServices.confirmEmail)
+// router.patch("/confirmEmail",
+//      isValidate(authValidators.confirmEmail),
+//      authServices.confirmEmail)
 
 router.post("/login",
      isValidate(authValidators.signInValidation),

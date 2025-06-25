@@ -11,13 +11,13 @@ const userSchema = new Schema({
     password:{type:String, required:function(){
         return this.provider == "system"? true: false;
     }, },
-    provider:{type:String, enum: Object.values(systemEnums.provider)},
+    // provider:{type:String, enum: Object.values(systemEnums.provider)},
     gender:{type:String, enum: Object.values(systemEnums.gender)},
     DOB:{type:Date, max: new Date("2025-01-01")},
     mobileNumber:{type:String},
     systemRole:{type:String, enum: Object.values(systemEnums.systemRoles), default:"user"},
     role:{type:String, enum: Object.values(systemEnums.roles), },
-    isConfirmed:{type:Boolean, default:false},
+    isConfirmed:{type:Boolean, default:true},
     deletedAt:{type:Date},
     changeCredentialTime:{type:Date},
     profilePic:{
@@ -31,8 +31,8 @@ const userSchema = new Schema({
     //     }],
         isDeleted:{type:Boolean , default: false},
         isBanned:{type:Boolean, default: false},
-        learningStyle:{type:String, required:function(){
-        return this.role == systemEnums.roles.student? true: false;
+        learningStyle:{type:[String], required:function(){
+        return this.role == systemEnums.roles.student
     }, },
     changePasswordTime:{type:Date}
         
@@ -53,7 +53,7 @@ userSchema.virtual('userName').get(function() {
 userSchema.pre("save", function(next){
     console.log("hooks runnong now");
     
-   if(this.provider=="system"){
+  //  if(this.provider=="system"){
     console.log("is this a system");
     
     if(this.isModified("password")){
@@ -72,7 +72,7 @@ userSchema.pre("save", function(next){
         
     }
     
-}
+// }
    
    return next()
 })
