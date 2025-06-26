@@ -1,32 +1,25 @@
-
 export const provider = {
-    system:"system",
-    google: "google",
-}
-
+  system: "system",
+  google: "google",
+};
 
 export const gender = {
-    male: "male",
-    female: "female",
-  
-}
+  male: "male",
+  female: "female",
+};
 
 export const systemRoles = {
-   
-    user: "user",
-    admin: "admin",
-    owner: "owner",
-    
-}
-
+  user: "user",
+  admin: "admin",
+  owner: "owner",
+};
 
 export const roles = {
-   
-   teacher:"teacher",
-   student:"student",
-    
-}
+  teacher: "teacher",
+  student: "student",
+};
+
 export const OTPtype = {
-    confirmEmail:"confirmEmail",
-    forgetPassword:"forgetPassword",
-}
+  confirmEmail: "confirmEmail",
+  forgetPassword: "forgetPassword",
+};

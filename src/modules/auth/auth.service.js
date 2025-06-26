@@ -9,15 +9,8 @@ import { OAuth2Client } from "google-auth-library";
 import { successResponse } from "../../utils/success/success.response.js";
 
 export const signUp = asyncHandler(async (req, res, next) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    DOB,
-    learningStyle,
-    mobileNumber,
-  } = req.body;
+  const { firstName, lastName, email, password, DOB, learningStyle, role } =
+    req.body;
 
   const userExists = await UserModel.findOne({ email });
   if (userExists) {
@@ -33,7 +26,7 @@ export const signUp = asyncHandler(async (req, res, next) => {
     password,
     DOB,
     learningStyle,
-    mobileNumber,
+    role,
     //  OTP:[
     //     {
     //         code: hashData({data:OTP}),

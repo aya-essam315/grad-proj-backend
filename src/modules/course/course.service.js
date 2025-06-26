@@ -266,6 +266,24 @@ export const savePlan = asyncHandler(async (req, res, next) => {
   });
 });
 
+export const getCoursePlan = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+
+  const course = await CourseModel.findById(courseId);
+  if (!course) {
+    return next(new Error("Course not found", { cause: 404 }));
+  }
+  const plan = await PlanModel.findOne({ courseId });
+  if (!plan) {
+    return res.status(404).json({ message: "No plan found" });
+  }
+  successResponse({
+    res,
+    data: plan,
+    statusCode: 200,
+  });
+});
+
 export const deletePlan = asyncHandler(async (req, res, next) => {
   const { planId } = req.params;
   const plan = await PlanModel.findByIdAndDelete({

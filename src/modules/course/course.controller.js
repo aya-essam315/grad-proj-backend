@@ -71,10 +71,12 @@ router.get(
   courseServices.getSyllabus
 );
 
-// router.get("/coursePlan/:courseId",
-//      authentication,
-//      authorization(endpoint.course),
-//      courseServices.getCoursePlan)
+router.get(
+  "/coursePlan/:courseId",
+  authentication,
+  authorization(endpoint.course),
+  courseServices.getCoursePlan
+);
 
 router.get("/:id", courseServices.getCourse);
 
