@@ -251,6 +251,33 @@
 					"response": []
 				},
 				{
+					"name": "get a course plan",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NWI2MzUwM2JmMWQ1ODE3YTc2OGI2ZCIsImlhdCI6MTc1MDgxOTY3NywiZXhwIjoxNzgyMzc3Mjc3fQ.vG1oirrDVH0jaFRXxeneSAzuDWAEb7U9il3nGcwx0BA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/course/coursePlan/685b007a713358c37095e9e5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"course",
+								"coursePlan",
+								"685b007a713358c37095e9e5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "save syllabus",
 					"request": {
 						"method": "POST",

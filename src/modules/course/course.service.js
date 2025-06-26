@@ -318,9 +318,10 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
   const prompt = `You are a professional in writing content
              ,Create detailed and long teaching content
              for the [${course.courseName}] topic in the [${weekNum.Subtopics}]
-              subject based on the following structure[${structure}]. 
-     Make sure the content is detailed, informative, and provides practical examples when needed. each topic must at least 30 lines,
- Return the response in a valid JSON format 
+            subject based on the following structure[${structure}]. 
+            Make sure the content is detailed, informative, and provides practical examples when needed.
+            each topic must at least 30 lines,
+            Return the response in a valid JSON format 
   `;
 
   const result = await chatBotService(prompt);
