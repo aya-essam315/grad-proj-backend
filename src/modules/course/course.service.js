@@ -287,7 +287,21 @@ export const savePlan = asyncHandler(async (req, res, next) => {
 });
 
 
-
+export const getCoursePlan = asyncHandler(async (req,res,next)=>{
+    const {courseId} = req.params;
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+        return next(new Error("course not found", {cause:404}))
+        }
+        const plan = await PlanModel.findOne({courseId});
+        if (!plan) {
+            return res.status(404).json({ message: "No plan found" });
+            }
+            successResponse({
+                res,
+                data: plan,
+                });
+})
 
 
 
@@ -354,9 +368,10 @@ export const createLessonContent = asyncHandler(
             const prompt = `You are a professional in writing content
              ,Create detailed and long teaching content
              for the [${course.courseName}] topic in the [${weekNum.Subtopics}]
-              subject based on the following structure[${structure}]. 
-     Make sure the content is detailed, informative, and provides practical examples when needed. each topic must at least 30 lines,
- Return the response in a valid JSON format 
+            subject based on the following structure[${structure}]. 
+            Make sure the content is detailed, informative, and provides practical examples when needed.
+            each topic must at least 30 lines,
+            Return the response in a valid JSON format 
   `;
 
      const result = await chatBotService(prompt);
