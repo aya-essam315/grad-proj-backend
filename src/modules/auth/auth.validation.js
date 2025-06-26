@@ -11,7 +11,6 @@ export const signUpValidation = joi
     confirmPassword: generlaFielsValidation.confirmPassword,
     gender: generlaFielsValidation.gender,
     DOB: generlaFielsValidation.DOB,
-    mobileNumber: generlaFielsValidation.mobileNumber,
     systemRole: joi.string().valid(...Object.values(systemRoles)),
     role: joi.string().valid(...Object.values(roles)),
     learningStyle: joi.array().items(joi.string()).when("role", {
