@@ -8,9 +8,10 @@ export const generlaFielsValidation = {
   password: joi
     .string()
     .pattern(new RegExp(/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/)),
+  
   confirmPassword: joi.ref("password"),
   gender: joi.string().valid(...Object.values(gender)),
-  // DOB: joi.date().min('1900-01-01').max('2025-03-02'),
+  // DOB: joi.date().min("1900-01-01").max("2025-03-02"),
   DOB: joi.string().pattern(new RegExp(/^\d{4}-\d{2}-\d{2}$/)),
   systemRole: joi.string().valid(...Object.values(systemRoles)),
   OTP: joi.string().length(6),
