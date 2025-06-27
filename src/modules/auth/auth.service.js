@@ -101,7 +101,7 @@ export const logIn = asyncHandler(async (req, res, next) => {
   successResponse({
     res,
     message: "loged in successfully",
-    data: { access_token, refresh_token },
+    data: { access_token, refresh_token, role: user.role },
   });
 });
 
