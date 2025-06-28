@@ -13,34 +13,6 @@ router.post("/add-course",
     isValidate(courseValidation.addCourseValidation),
     courseServices.addCourse)
 
-router.delete("/:courseId",
-    authentication,
-    authorization(endpoint.course),
-     courseServices.deleteCourse)
-
-router.post("/createSyllabus/:courseId",
-     authentication,
-     authorization(endpoint.course),
-     courseServices.createSyllabus)
-
-
-router.post("/savesyllabus/:courseId",
-     authentication,
-     authorization(endpoint.course),
-     courseServices.saveSyllabus)
-
-
-
-router.post("/createPlan/:courseId",
-       authentication,
-     authorization(endpoint.course),
-     courseServices.createPlan)
-
-router.put("/savePlan/:courseId",
-       authentication,
-       authorization(endpoint.course),
-     courseServices.savePlan)
-
 router.get("/:courseId",
        authentication,
        authorization(endpoint.course),
@@ -51,29 +23,119 @@ router.get("/",
      authentication,
      authorization(endpoint.course),
      courseServices.getAllCourse)
+router.delete("/:courseId",
+    authentication,
+    authorization(endpoint.course),
+     courseServices.deleteCourse)
 
 
-router.get("/syllabus/:courseId",
+//syllabus
+router.post("/:courseId/createSyllabus",
+     authentication,
+     authorization(endpoint.course),
+     courseServices.createSyllabus)
+
+
+router.post("/:courseId/savesyllabus",
+     authentication,
+     authorization(endpoint.course),
+     courseServices.saveSyllabus)
+
+
+
+router.get("/:courseId/syllabus/",
      authentication,
      authorization(endpoint.course),
      courseServices.getSyllabus)
 
-router.get("/coursePlan/:courseId",
+
+
+router.post("/:courseId/createPlan",
+       authentication,
+     authorization(endpoint.course),
+     courseServices.createPlan)
+
+router.put("/:courseId/savePlan",
+       authentication,
+       authorization(endpoint.course),
+     courseServices.savePlan)
+
+router.get("/:courseId/coursePlan",
      authentication,
      authorization(endpoint.course),
      courseServices.getCoursePlan)
 
 
 
+
+
+//lesson
+router.post("/:courseId/createLessonContent",
+      authentication,
+     authorization(endpoint.course),
+      courseServices.createLessonContent)
+
+router.put("/:courseId/save-lesson-content",
+       authentication,
+       authorization(endpoint.course),
+       courseServices.saveLessonContent)
+
+router.get("/:courseId/:lessonId",
+     authentication,
+     authorization(endpoint.course),
+     courseServices.getContent)
+
+//assignment
+router.post("/:courseId/create-assignment",
+      authentication,
+     authorization(endpoint.course),
+      courseServices.createAssignment)
+
+router.put("/:courseId/save-assignment",
+      authentication,
+     authorization(endpoint.course),
+      courseServices.saveAssignment)
+
+//exam
+router.post("/:courseId/create-exam", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.createExam)
+
+router.put("/:courseId/save-exam", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.saveExam)
+
+
+router.get("/:cousreId/get-exam/:examId", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.getExam)
+
+
+
+router.delete("/:couresId/delete-exam/:examId", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.deleteExam)
+
+
+//activitis
+router.post("/:courseId/create-activities", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.createActivity)
+
+
+router.put("/:courseId/save-activities", 
+     authentication,
+     authorization(endpoint.course),
+     courseServices.createActivity)
+
+
 router.get("/:id", courseServices.getCourse)
 
-
-
-
-
-router.post("/createPlan/savePlan/:courseId", courseServices.savePlan)
-router.post("/createLessonContent/:id", courseServices.createLessonContent)
-router.post("/createLessonContent/saveLesson/:id", courseServices.saveLessonContent)
 
 
 

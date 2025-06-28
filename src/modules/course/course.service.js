@@ -1,4 +1,7 @@
+import { ActivityModel } from "../../db/models/activitis.js";
+import { AssignmentModel } from "../../db/models/assignment.js";
 import {CourseModel} from "../../db/models/course.model.js"
+import { ExamModel } from "../../db/models/exam.js";
 import { LessonModel } from "../../db/models/lesson.model.js";
 import { PlanModel } from "../../db/models/plan.model.js";
 import {SyllabusModel} from "../../db/models/syllabus.js"
@@ -171,7 +174,7 @@ export const getSyllabus = asyncHandler(async (req,res,next)=>{
 
         const course = await CourseModel.findById(courseId,{createdBy: req.authUser._id});
     if(!course){
-       successResponse(new Error("Course not found", {cause:404}))
+      return next(new Error("Course not found", {cause:404}))
         }
         const Syllabus = await SyllabusModel.findOne({
               courseId,
@@ -180,6 +183,7 @@ export const getSyllabus = asyncHandler(async (req,res,next)=>{
         if(!Syllabus){
             return next(new Error("no syllabus found"))
             }
+
             successResponse({res, message:"done", data:Syllabus})
         
 })
@@ -305,15 +309,6 @@ export const getCoursePlan = asyncHandler(async (req,res,next)=>{
 
 
 
-
-
-
-
-
-
-
-
-
 export const deletePlan = asyncHandler(async (req,res,next)=>{
     const {planId} = req.params;
     const plan = await PlanModel.findByIdAndDelete({_id:planId,    createdBy: req.user._id});
@@ -329,60 +324,55 @@ export const deletePlan = asyncHandler(async (req,res,next)=>{
 export const createLessonContent = asyncHandler(
     async(req,res,next)=>{
  
-        const { id } = req.params;
-        // console.log(id);
+        const { courseId } = req.params;
+        //  const week = req.query.week;
+        // if (week === -1) return res.status(400).send("Week not found");
+        const { LectureName, Subtopics=[]  } = req.body;
         
-        const { week } = req.body;
-        
-        const course = await CourseModel.findById(id);
+        const course = await CourseModel.findById(courseId);
 
         if(!course){
-            return res.status(404).json({success:false,message: "Course not found"});
+        return next(new Error("course not found", {cause:404}))
             }
-            const plan = await PlanModel.findOne({courseId:id});
+            const plan = await PlanModel.findOne({courseId});
             if(!plan){
                 return res.status(404).json({success:false,message: "Plan not found"});
                 }
-     
-
-            const planCoures =await PlanModel.findOne({courseId:id});
-
-            // console.log(planCoures.teachingPlan[week-1]);
+           
+            // console.log(plan.teachingPlan[week-1]);
+         
             // return
 
-            // const lessonDetails = course.coursePlan.teachingPlan[weekIndex];
-            
-            
-            // if (weekIndex === -1) return res.status(400).send("Week not found");
-            // return
-            // res.json(topics)
+            // const lecWeek = plan.teachingPlan[week-1];
+            // const LectureName =lecWeek.LectureName;
+            // const Subtopics = lecWeek.Subtopics;
+
             let structure = course.contentStructure
-            console.log(structure);
+
             if(!structure){
                 structure = `suitable structure`
             }
           
-            console.log(structure);
-            const weekNum = planCoures.teachingPlan[week-1]
+
             
             const prompt = `You are a professional in writing content
              ,Create detailed and long teaching content
-             for the [${course.courseName}] topic in the [${weekNum.Subtopics}]
+             for the [${LectureName}] topic in the [${Subtopics}]
             subject based on the following structure[${structure}]. 
             Make sure the content is detailed, informative, and provides practical examples when needed.
-            each topic must at least 30 lines,
-            Return the response in a valid JSON format 
+            each subtopic topic must at least 30 lines,
+           
   `;
 
      const result = await chatBotService(prompt);
      console.log(result);
      const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
     //  return res.json(JSON.parse(text))
-     console.log(text);
+    //  console.log(text);
      
      
-     const lesson = extractJson(text);
-     res.json(lesson)
+    //  const lesson = extractJson(text);
+     successResponse({res, data:text})
 
 
 
@@ -391,11 +381,13 @@ export const createLessonContent = asyncHandler(
 
 
 export const saveLessonContent = asyncHandler(async(req,res,next)=>{
-    const id = req.params.id;
-    const lesson = req.body;
+    const {courseId} = req.params;
+    const {content} = req.body;
+  
     const createdLesson = await LessonModel.create({
-        courseId:id,
-         lesson
+        courseId,
+         content,
+         createdBy:req.authUser._id
     })
     successResponse({
         res,
@@ -403,3 +395,247 @@ export const saveLessonContent = asyncHandler(async(req,res,next)=>{
         data:createdLesson
     })
 })
+
+export const getContent = asyncHandler(async(req,res,next)=>{
+    const {courseId, lessonId} = req.params;
+    const course = await CourseModel.findById(courseId);
+    if(!course) {
+        return next(new ErrorResponse("Course not found", 404));
+        }
+
+  const lesson = await LessonModel.findById(lessonId).select("content");
+  if(!lesson) {
+    return next(new ErrorResponse("Lesson not found", 404));
+    }
+    successResponse({
+        res,
+        data:lesson
+        })
+
+})
+
+export const createAssignment= asyncHandler(async(req,res,next)=>{
+       const { courseId } = req.params;
+        //  const week = req.query.week;
+        // if (week === -1) return res.status(400).send("Week not found");
+        const { LectureName, Subtopics=[]  } = req.body;
+        
+        const course = await CourseModel.findById(courseId);
+
+        if(!course){
+        return next(new Error("course not found", {cause:404}))
+            }
+            // const plan = await PlanModel.findOne({courseId});
+            // if(!plan){
+            //     return res.status(404).json({success:false,message: "Plan not found"});
+            //     }
+           
+            // console.log(plan.teachingPlan[week-1]);
+         
+            // return
+
+            // const lecWeek = plan.teachingPlan[week-1];
+            // const LectureName =lecWeek.LectureName;
+            // const Subtopics = lecWeek.Subtopics;
+
+          
+            const prompt = `for ${LectureName} Based on the following topics: [${Subtopics}],
+             create an Assignment,
+             Display the questions in an organized manner
+             Make sure that the output is clear and easy to read,
+             without metadata or difficulty indicators in the questions,
+             and without answers, Return the response as valid JSON as like this example:
+             {
+            title: "lecture name",
+            questions: [
+                { id: 1, question..." },
+                { id: 2, question... } and so on
+                       ]}`;
+
+     const result = await chatBotService(prompt);
+     console.log(result);
+     const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
+    //  return res.json(JSON.parse(text))
+    //  console.log(text);
+     
+     
+     const assignment = extractJson(text);
+     successResponse({res, data:assignment})
+
+}
+
+)
+
+export const saveAssignment = asyncHandler(async (req, res, next) =>{
+    const {courseId} = req.params;
+    const {assignment} = req.body;
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return next(new Error("course not found", {cause:404}))
+        }
+        const createdAssignment = await AssignmentModel.create({
+            courseId,
+            assignment
+        });
+        successResponse({res, data:createdAssignment})
+})
+
+
+export const getAssignment = asyncHandler(async (req, res, next) =>{
+    const {courseId, assignmentId} = req.params;
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return next(new Error("course not found", {cause:404}))
+        }
+        const assignment = await AssignmentModel.findOne({courseId})
+        successResponse({res, data:assignment})
+})
+
+//crud exam
+
+export const createExam = asyncHandler(async(req,res,next)=>{
+    const {courseId} = req.params;
+    const {LectureNames=[], Subtopics=[]}=req.body
+
+    console.log(courseId);
+    
+    const {numOfQuestions, easy, median, hard, score, allowedTime , questionType= []} = req.body;
+    console.log({numOfQuestions, easy, median, hard, score, allowedTime , questionType});
+    
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return res.status(404).json({success:false,message: "Course not found"});
+        }
+        const level = course.level;
+        // const plan = await PlanModel.find({courseId});
+        // console.log(plan);
+        
+        
+
+    const prompt = `Based on the following topics ${Subtopics} for ${level}:
+    [subtopics], create an Exam with [${numOfQuestions}] questions
+    divided into [${easy}]% easy, [${median}]% medium, and [${hard}]% hard.
+    Include [${questionType}] questions.
+    The total score should be [${score}], distributed according to difficulty levels.
+    The exam should be designed to fit within a time limit of [${allowedTime}] mins,
+    ensuring that the questions are appropriate for the given time.
+    Some questions should require longer answers, while others should be shorter to align with the overall time limit.
+    Display the questions in an organized manner with scores next to each one.
+    Make sure the output is clear and easy to read, without metadata or difficulty indicators in the questions,
+    and without answers, Return the response as valid JSON`
+
+         const result = await chatBotService(prompt);
+     console.log(result);
+     const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
+    //  return res.json(JSON.parse(text))
+    //  console.log(text);
+     
+     
+     const assignment = extractJson(text);
+     successResponse({res, data:assignment})
+    
+})
+
+
+export const saveExam = asyncHandler(async (req, res, next) =>{
+    const {courseId} = req.params;
+    const {exam} = req.body;
+    console.log(exam);
+
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return res.status(404).json({success:false,message: "Course not found"});
+        }
+
+    const createdExam = await ExamModel.create({
+        courseId,
+        exam,
+        createdBy:req.authUser._id,
+     
+    })
+    successResponse({res, data:createdExam})
+
+})
+
+
+
+export const getExam = asyncHandler(async (req, res, next) =>{
+    const {examId} = req.params;
+    const exam = await ExamModel.findById(examId)
+    if(!exam){
+        return next(new Error("no exam found"))
+        }
+        successResponse({res, data:exam})
+})
+
+
+export const deleteExam = asyncHandler(async (req, res, next) =>{
+    const {courseId,examId} = req.params;
+    const exam = await ExamModel.findOneAndDelete({_id:examId, createdBy:req.authUser._id} )
+    if(!exam){
+        return next(new Error("no exam found"))
+        }
+        successResponse({res,message:"exam deleted successfully", })
+})
+
+
+
+//activities
+export const createActivity = asyncHandler(async (req, res, next) =>{
+    const {courseId} = req.params;
+    const {activity} = req.body;
+    console.log(activity);
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return res.status(404).json({success:false,message: "Course not found"});
+        }
+        const plan = await PlanModel.find({courseId})
+
+
+    const prompt = `Create a list of max(5) hands-on projects to teach students
+     through project-based learning. Covering [${course.courseName}] and syllabus by
+      [${plan}]. Projects should align with course skills [e.g. use of research tools,
+       programming, problem solving, presentation skills].
+        Ensure that projects cover all aspects of the course content and meet the learning objectives.
+         Each project should have a brief description (maximum 3 sentences).Return the response as valid JSON
+         as like: {
+        "projects": [
+            {
+                "name": "activity name",
+                "description": "disription of activity",
+                }]}
+`
+
+         const result = await chatBotService(prompt);
+     console.log(result);
+     const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
+    //  return res.json(JSON.parse(text))
+    //  console.log(text);
+     
+     
+     const activities = extractJson(text);
+     successResponse({res, data:activities})
+    
+})
+
+
+export const saveActivitis = asyncHandler(async (req, res, next) =>{
+    const {courseId} = req.params;
+    const {activities} = req.body;
+    const course = await CourseModel.findById(courseId);
+    if(!course){
+        return res.status(404).json({success:false,message: "Course not found"});
+        }
+        const createdActivities = await ActivityModel.create({
+            courseId,
+            activities
+        })
+        successResponse({res, data:createdActivities})
+})
+
+// export const getActivities = asyncHandler(async (req, res, next) =>
+// {
+//     const {courseId, } = req.params;
+// }
+
+// )

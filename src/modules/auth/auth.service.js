@@ -10,7 +10,7 @@ import { successResponse } from "../../utils/success/success.response.js";
 
 
 export const signUp = asyncHandler(async (req,res,next) => {
-    const {firstName, lastName, email, password, DOB, learningStyle}= req.body;
+    const {firstName, lastName, email, password, DOB, learningStyle, role}= req.body;
     
     const userExists = await UserModel.findOne({email});
     if(userExists){
@@ -26,6 +26,7 @@ export const signUp = asyncHandler(async (req,res,next) => {
        password,
        DOB,
        learningStyle,
+       role
      
         //  OTP:[
         //     {
@@ -103,7 +104,7 @@ export const logIn = asyncHandler(async (req,res,next)=>{
         expiresIn:604800
     }) 
     await user.save()
-   successResponse({res, message:"loged in successfully", data:{access_token, refresh_token}})
+   successResponse({res, message:"loged in successfully", data:{access_token, refresh_token, role:user.role}})
 })
 
 
