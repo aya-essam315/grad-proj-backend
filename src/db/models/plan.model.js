@@ -1,5 +1,5 @@
-
 import { Schema, Types, model } from "mongoose";
+
 
 const planSchema = new Schema({
     courseId: {type: Types.ObjectId, ref:"Course"},
@@ -8,5 +8,4 @@ const planSchema = new Schema({
     
 },{strict:false, _id:true})
 
-
-export const PlanModel = model("Plan", planSchema)
+export const PlanModel = model("Plan", planSchema);

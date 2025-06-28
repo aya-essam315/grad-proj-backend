@@ -1,97 +1,91 @@
+
 import { ActivityModel } from "../../db/models/activitis.js";
 import { AssignmentModel } from "../../db/models/assignment.js";
 import {CourseModel} from "../../db/models/course.model.js"
 import { ExamModel } from "../../db/models/exam.js";
 import { LessonModel } from "../../db/models/lesson.model.js";
 import { PlanModel } from "../../db/models/plan.model.js";
-import {SyllabusModel} from "../../db/models/syllabus.js"
+import { SyllabusModel } from "../../db/models/syllabus.js";
 import { chatBotService } from "../../utils/apiKey/api.key.js";
 import { asyncHandler } from "../../utils/errors/async.handler.js";
 import { extractJson } from "../../utils/extractContent.js";
 import { successResponse } from "../../utils/success/success.response.js";
 
-
-
-
-
 function cleanText(text) {
   return text
-    .replace(/[*\\/]/g, "")     // remove asterisks, slashes, backslashes
-    .replace(/\\n/g, " ")       // replace \n with space
-    .replace(/\s+/g, " ")       // collapse multiple spaces into one
-    .trim();                    // remove leading/trailing spaces
+    .replace(/[*\\/]/g, "") // remove asterisks, slashes, backslashes
+    .replace(/\\n/g, " ") // replace \n with space
+    .replace(/\s+/g, " ") // collapse multiple spaces into one
+    .trim(); // remove leading/trailing spaces
 }
 
-export const addCourse = asyncHandler(async(req,res,next)=>{
-    const {courseName, courseCode, domain, subdomain, level} = req.body;
+export const addCourse = asyncHandler(async (req, res, next) => {
+  const { courseName, courseCode, domain, subdomain, level } = req.body;
 
-    const prompt = `Specify the steps for submitting content
+  const prompt = `Specify the steps for submitting content
      for a lesson in the [${courseName}] course . Don't write the content,
       just give me the correct order of how the information is presented according
        to the nature of the material. Make the arrangement appropriate to the way
         this subject is taught."
-`
-    const result = await chatBotService(prompt);
-    console.log(result);
-    let contentStructure = result.response.candidates[0]?.content?.parts[0]?.text || "";
-    contentStructure = cleanText(contentStructure);
+`;
+  const result = await chatBotService(prompt);
+  console.log(result);
+  let contentStructure =
+    result.response.candidates[0]?.content?.parts[0]?.text || "";
+  contentStructure = cleanText(contentStructure);
 
-    const newCourse = await CourseModel.create({
-        courseName,
-        courseCode,
-        domain,
-        subdomain,
-        contentStructure,
-        createdBy:req.authUser._id
-    });
-   successResponse({res, message:"Course created successfully", data:newCourse})
-    
-})
+  const newCourse = await CourseModel.create({
+    courseName,
+    courseCode,
+    domain,
+    subdomain,
+    contentStructure,
+    createdBy: req.authUser._id,
+    level
+  });
+  successResponse({
+    res,
+    message: "Course created successfully",
+    data: newCourse,
+  });
+});
 
+export const deleteCourse = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  const course = await CourseModel.findByIdAndDelete({
+    _id: courseId,
+    createdBy: req.authUser._id,
+  });
+  if (!course) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+  successResponse({ res, message: "course deleted successfully" });
+});
 
+export const getCourse = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  const course = await CourseModel.findById(courseId).select(
+    "-contentStructure"
+  );
+  if (!course) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+  successResponse({ res, message: "done", data: course });
+});
 
-export const deleteCourse = asyncHandler(async(req,res,next)=>{
-    const {courseId} = req.params;
-    const course = await CourseModel.findByIdAndDelete({_id:courseId,  createdBy: req.authUser._id});
-    if(!course) {
-        return res.status(404).json({message: "Course not found"});
-        }
-         successResponse({res, message:"course deleted successfully"})
-})
+export const getAllCourse = asyncHandler(async (req, res, next) => {
+  let courses = await CourseModel.find().select("-contentStructure");
 
+  successResponse({ res, message: "done", data: courses });
+});
 
-
-export const getCourse = asyncHandler(async(req,res,next)=>{
-    const {courseId} = req.params;
-    const course = await CourseModel.findById(courseId).select("courseCode courseName")
-    
-    if(!course) {
-        return res.status(404).json({message: "Course not found"});
-        }
-    const coursePlan = await PlanModel.findOne({courseId}).select("-createdBy")
-    console.log(coursePlan);
-     
-      successResponse({res, data:{course, coursePlan}})
-})
-
-
-export const getAllCourse = asyncHandler(async(req,res,next)=>{
-    let courses = await CourseModel.find().select("-contentStructure")
-   
-    successResponse({res, message:"done", data:courses})
-    
-
-})
-
-
-export const createSyllabus= asyncHandler(
-    async(req,res,next)=>{
-    const {courseId} = req.params;
-    const course = await CourseModel.findById(courseId);
-    if(!course){
-        return next(new Error("Course not found", {cause:404}))
-        }
-    const prompt = `"You are a professional instructor specializing in [${course.subdomain}],
+export const createSyllabus = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  const course = await CourseModel.findById(courseId);
+  if (!course) {
+    return next(new Error("Course not found", { cause: 404 }));
+  }
+  const prompt = `"You are a professional instructor specializing in [${course.subdomain}],
 Your task is to create a structured syllabus for the course "[${course.courseName}]" that is suitable for [${course.level}]
  students in the [${course.domain} - ${course.subdomain}] field.
 The syllabus should be well-organized, ensuring that the topics are presented in a logical sequence.
@@ -111,84 +105,79 @@ The syllabus should be well-organized, ensuring that the topics are presented in
                     ]
                 },"`;
 
- const result = await chatBotService(prompt);
- console.log(result);
- const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
- 
- const syllabus = extractJson(text);
-//  console.log(syllabus);
- 
+  const result = await chatBotService(prompt);
+  console.log(result);
+  const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
 
-// await course.updateOne({syllabus})
-// await course.save();
+  const syllabus = extractJson(text);
+  //  console.log(syllabus);
 
-  successResponse({res, message:"Syllabus created successfully", data:syllabus})
-}
+  // await course.updateOne({syllabus})
+  // await course.save();
 
-)
+  successResponse({
+    res,
+    message: "Syllabus created successfully",
+    data: syllabus,
+  });
+});
 
+export const saveSyllabus = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  const { syllabus } = req.body;
+  if (!syllabus) {
+    return next(new Error("no syllabus"));
+  }
+  const course = await CourseModel.findById(courseId);
+  if (!course) {
+    successResponse(new Error("Course not found", { cause: 404 }));
+  }
+  // console.log(syllabus);
+  const createdSyllabus = await SyllabusModel.create({
+    courseId,
+    syllabus,
 
+    //  createdBy:req.user._id
+  });
+  successResponse({
+    res,
+    message: "syllabus created successfully",
+    data: createdSyllabus,
+    statusCode: 201,
+  });
+});
 
-export const saveSyllabus = asyncHandler(async (req,res,next)=>{
-    const {courseId} = req.params;
-    const {syllabus} = req.body;
-    if(!syllabus){
-        return next(new Error("no syllabus"))
-    }
-      const course = await CourseModel.findById(courseId);
-    if(!course){
-       successResponse(new Error("Course not found", {cause:404}))
-        }
-    // console.log(syllabus);
-    const createdSyllabus = await SyllabusModel.create({
-        courseId,
-        syllabus,
-         
-        //  createdBy:req.user._id
-        }
-        );
-    successResponse({res, message:"syllabus created successfully", data:createdSyllabus, statusCode:201})
+export const deleteSyllabus = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
 
-})
+  const deletedSyllabus = await SyllabusModel.findByIdAndDelete({
+    _id: syllabusId,
+    createdBy: req.authUser._id,
+  });
+  if (!deletedSyllabus) {
+    return res.status(404).json({ message: "Syllabus not found" });
+  }
+  successResponse({ res, message: "Syllabus deleted successfully" });
+});
 
+export const getSyllabus = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
 
-export const deleteSyllabus = asyncHandler(async (req,res,next)=>{
-    const {courseId} = req.params;
-    
-    
-        const deletedSyllabus = await SyllabusModel.findByIdAndDelete({
-              _id: syllabusId,
-              createdBy: req.authUser._id
-        });
-        if(!deletedSyllabus){
-            return res.status(404).json({message: "Syllabus not found"});
-            }
-            successResponse({res, message:"Syllabus deleted successfully"})
-        
-})
-
-
-
-export const getSyllabus = asyncHandler(async (req,res,next)=>{
-        const {courseId} = req.params;
-
-        const course = await CourseModel.findById(courseId,{createdBy: req.authUser._id});
-    if(!course){
-      return next(new Error("Course not found", {cause:404}))
-        }
-        const Syllabus = await SyllabusModel.findOne({
-              courseId,
-            //   createdBy: req.authUser._id
-        });
-        if(!Syllabus){
-            return next(new Error("no syllabus found"))
-            }
-
-            successResponse({res, message:"done", data:Syllabus})
-        
-})
-
-
+  const course = await CourseModel.findById(courseId, {
+    createdBy: req.authUser._id,
+  });
+  if (!course) {
+    successResponse(new Error("Course not found", { cause: 404 }));
+  }
+  const Syllabus = await SyllabusModel.findOne({
+    courseId,
+    //   createdBy: req.authUser._id
+  });
+  if (!Syllabus) {
+    return next(new Error("no syllabus found"));
+  }
+  successResponse({ res, message: "done", data: Syllabus });
+});
 
 
 export const createPlan = asyncHandler(async(req,res,next)=>{
@@ -213,7 +202,8 @@ export const createPlan = asyncHandler(async(req,res,next)=>{
             if(!syllabus){
                 return next(new Error("syllabus not found", {cause:404}))
             }
-const prompt = `You are a professional curriculum planner.
+const prompt =  `You are a professional curriculum planner.
+>>>>>>> eac5c93e1ade6a895f73a1f1cc6f426b84c90af2
 Your task is to create a structured and complete teaching plan for the course titled: [${course.courseName}].  
 The course syllabus is as follows: [${syllabus}]. Use the **exact subtopics in the same order** as provided.
 Generate a teaching plan covering **${numberOfWeeks} weeks**, with a balanced distribution of topics.  
@@ -241,84 +231,77 @@ json
 }, lecture and its subtopics must be the same as of the syllabus 
 `;
 
-     const result = await chatBotService(prompt);
-     console.log(result);
-     const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
-     const coursePlan = extractJson(text);
-    //  console.log(plan);
-//  await course.updateOne({coursePlan})
-       
-    successResponse({res, message:"done", data:coursePlan})
+  const result = await chatBotService(prompt);
+  //   console.log(result);
+  const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
+  const coursePlan = extractJson(text);
+  console.log(coursePlan);
+  //  await course.updateOne({coursePlan})
 
-})
-
-
-export const savePlan = asyncHandler(async (req, res, next) => {
-    const { courseId } = req.params;
-    console.log( req.params);
-    
-    const { teachingPlan } = req.body;
-
-    const course = await CourseModel.findById(courseId);
-    if (!course) {
-        return next(new Error("course not found", {cause:404}))
-    }
-
-    // const syllabus = await SyllabusModel.findOne({ courseId });
- 
-
-    // if (!syllabus) {
-    //     return res.status(404).json({ message: "No syllabus found" });
-    // }
-
-
-
-    const createdPlan = await PlanModel.create({
-        courseId,
-        // syllabusId: syllabus._id,
-        teachingPlan,
-        createdBy: req.authUser._id
-    }); 
- 
-    console.log(createdPlan);
-
-    successResponse({
-        res,
-        message: "Plan created successfully",
-        data: createdPlan,
-        statusCode: 201
-    });
+  successResponse({ res, message: "done", data: coursePlan });
 });
 
+export const savePlan = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  console.log(req.params);
 
-export const getCoursePlan = asyncHandler(async (req,res,next)=>{
-    const {courseId} = req.params;
-    const course = await CourseModel.findById(courseId);
-    if (!course) {
-        return next(new Error("course not found", {cause:404}))
-        }
-        const plan = await PlanModel.findOne({courseId});
-        if (!plan) {
-            return res.status(404).json({ message: "No plan found" });
-            }
-            successResponse({
-                res,
-                data: plan,
-                });
+  const { teachingPlan } = req.body;
+
+  const course = await CourseModel.findById(courseId);
+  if (!course) {
+    return next(new Error("course not found", { cause: 404 }));
+  }
+  
+   // const syllabus = await SyllabusModel.findOne({ courseId });
+
+  const createdPlan = await PlanModel.create({
+    courseId,
+    // syllabusId: syllabus._id,
+    teachingPlan,
+    createdBy: req.authUser._id,
+  });
+
+  console.log(createdPlan);
+
+  successResponse({
+    res,
+    message: "Plan created successfully",
+    data: createdPlan,
+    statusCode: 201,
+  });
 })
 
 
 
-export const deletePlan = asyncHandler(async (req,res,next)=>{
-    const {planId} = req.params;
-    const plan = await PlanModel.findByIdAndDelete({_id:planId,    createdBy: req.user._id});
-    if(!plan){
-        return res.status(404).json({message: "Plan not found"});
-        }
-        successResponse({res, message:"Plan deleted successfully"})
-})
+export const getCoursePlan = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
 
+  const course = await CourseModel.findById(courseId);
+  if (!course) {
+    return next(new Error("Course not found", { cause: 404 }));
+  }
+  const plan = await PlanModel.findOne({ courseId });
+  if (!plan) {
+    return res.status(404).json({ message: "No plan found" });
+  }
+  successResponse({
+    res,
+    data: plan,
+    statusCode: 200,
+  });
+});
 
+export const deletePlan = asyncHandler(async (req, res, next) => {
+  const { planId } = req.params;
+  const plan = await PlanModel.findByIdAndDelete({
+    _id: planId,
+    createdBy: req.user._id,
+  });
+  if (!plan) {
+    return res.status(404).json({ message: "Plan not found" });
+  }
+  successResponse({ res, message: "Plan deleted successfully" });
+});
 
 
 export const createLessonContent = asyncHandler(
@@ -355,7 +338,8 @@ export const createLessonContent = asyncHandler(
           
 
             
-            const prompt = `You are a professional in writing content
+            const prompt =  `You are a professional in writing content
+>>>>>>> eac5c93e1ade6a895f73a1f1cc6f426b84c90af2
              ,Create detailed and long teaching content
              for the [${LectureName}] topic in the [${Subtopics}]
             subject based on the following structure[${structure}]. 
@@ -374,6 +358,7 @@ export const createLessonContent = asyncHandler(
     //  const lesson = extractJson(text);
      successResponse({res, data:text})
 
+ 
 
 
 }
@@ -632,10 +617,3 @@ export const saveActivitis = asyncHandler(async (req, res, next) =>{
         })
         successResponse({res, data:createdActivities})
 })
-
-// export const getActivities = asyncHandler(async (req, res, next) =>
-// {
-//     const {courseId, } = req.params;
-// }
-
-// )
