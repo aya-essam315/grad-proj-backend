@@ -344,11 +344,7 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
          content,
          createdBy:req.authUser._id
     })
-     successResponse({res, data:content})
-
- 
-
-
+     successResponse({res, data:createdLesson})
 }
 )
 
