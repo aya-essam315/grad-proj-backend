@@ -326,11 +326,8 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
             if(!structure){
                 structure = `suitable structure`
             }
-          
-
             
             const prompt =  `You are a professional in writing content
->>>>>>> eac5c93e1ade6a895f73a1f1cc6f426b84c90af2
              ,Create detailed and long teaching content
              for the [${LectureName}] topic in the [${Subtopics}]
             subject based on the following structure[${structure}]. 
@@ -341,13 +338,13 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
 
      const result = await chatBotService(prompt);
      console.log(result);
-     const text = result.response.candidates[0]?.content?.parts[0]?.text || "";
-    //  return res.json(JSON.parse(text))
-    //  console.log(text);
-     
-     
-    //  const lesson = extractJson(text);
-     successResponse({res, data:text})
+     const content = result.response.candidates[0]?.content?.parts[0]?.text || "";
+  const createdLesson = await LessonModel.create({
+        courseId,
+         content,
+         createdBy:req.authUser._id
+    })
+     successResponse({res, data:content})
 
  
 
@@ -357,18 +354,14 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
 
 
 export const saveLessonContent = asyncHandler(async(req,res,next)=>{
-    const {courseId} = req.params;
+    const {courseId, lessonId} = req.params;
     const {content} = req.body;
   
-    const createdLesson = await LessonModel.create({
-        courseId,
-         content,
-         createdBy:req.authUser._id
-    })
+  const updatedLesson = await LessonModel.findByIdAndUpdate(lessonId,{content}, {new: true});
     successResponse({
         res,
-        message:"Lesson created successfully",
-        data:createdLesson
+        message:"Lesson updated successfully",
+        data:updatedLesson
     })
 })
 
