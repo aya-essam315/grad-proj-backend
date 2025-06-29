@@ -75,7 +75,7 @@ router.post("/:courseId/createLessonContent",
      authorization(endpoint.course),
       courseServices.createLessonContent)
 
-router.put("/:courseId/save-lesson-content",
+router.put("/:courseId/save-lesson-content/:lessonId",
        authentication,
        authorization(endpoint.course),
        courseServices.saveLessonContent)

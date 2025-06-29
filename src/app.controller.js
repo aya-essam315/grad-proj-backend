@@ -1,6 +1,7 @@
 import { connectDB } from "./db/connection.js";
 import authRouter from "./modules/auth/auth.controller.js";
 import courseRouter from "./modules/course/course.controller.js";
+
 import { globalError } from "./utils/errors/globalerror.js";
 import cors from "cors";
 export const bootStrap = async (app, express) => {
@@ -11,6 +12,7 @@ export const bootStrap = async (app, express) => {
 
   app.use("/course", courseRouter);
 
+  // app.use("/study", studyRouter);
   app.all("*", (req, res, next) => {
     res.status(404).json({
       success: false,
