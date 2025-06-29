@@ -323,11 +323,11 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
 
   let structure = course.contentStructure;
 
-            if(!structure){
-                structure = `suitable structure`
-            }
-            
-            const prompt =  `You are a professional in writing content
+  if (!structure) {
+    structure = `suitable structure`;
+  }
+
+  const prompt = `You are a professional in writing content
              ,Create detailed and long teaching content
              for the [${LectureName}] topic in the [${Subtopics}]
             subject based on the following structure[${structure}]. 
@@ -336,30 +336,44 @@ export const createLessonContent = asyncHandler(async (req, res, next) => {
            
   `;
 
-     const result = await chatBotService(prompt);
-     console.log(result);
-     const content = result.response.candidates[0]?.content?.parts[0]?.text || "";
+  const result = await chatBotService(prompt);
+  console.log(result);
+  const content = result.response.candidates[0]?.content?.parts[0]?.text || "";
   const createdLesson = await LessonModel.create({
-        courseId,
-         content,
-         createdBy:req.authUser._id
-    })
-     successResponse({res, data:createdLesson})
-}
-)
+    courseId,
+    content,
+    LectureName,
+    createdBy: req.authUser._id,
+  });
+  successResponse({ res, data: createdLesson });
+});
 
+export const saveLessonContent = asyncHandler(async (req, res, next) => {
+  const { courseId, lessonId } = req.params;
+  const { content } = req.body;
 
-export const saveLessonContent = asyncHandler(async(req,res,next)=>{
-    const {courseId, lessonId} = req.params;
-    const {content} = req.body;
-  
-  const updatedLesson = await LessonModel.findByIdAndUpdate(lessonId,{content}, {new: true});
-    successResponse({
-        res,
-        message:"Lesson updated successfully",
-        data:updatedLesson
-    })
-})
+  const updatedLesson = await LessonModel.findByIdAndUpdate(
+    lessonId,
+    { content },
+    { new: true }
+  );
+  successResponse({
+    res,
+    message: "Lesson updated successfully",
+    data: updatedLesson,
+  });
+});
+
+export const getAllLessons = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const lessons = await LessonModel.find({ courseId: id });
+
+  successResponse({
+    res,
+    message: "Fetched Successfally",
+    data: lessons,
+  });
+});
 
 export const getContent = asyncHandler(async (req, res, next) => {
   const { courseId, lessonId } = req.params;
