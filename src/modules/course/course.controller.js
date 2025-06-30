@@ -22,8 +22,7 @@ router.get(
   courseServices.getCourse
 );
 
-router.get(
-  "/",
+router.get("/",
   authentication,
   authorization(endpoint.course),
   courseServices.getAllCourse
@@ -163,7 +162,7 @@ router.put(
   "/:courseId/save-activities",
   authentication,
   authorization(endpoint.course),
-  courseServices.createActivity
+  courseServices.saveActivitis
 );
 
 router.get("/:id", courseServices.getCourse);

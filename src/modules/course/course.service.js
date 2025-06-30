@@ -8,6 +8,7 @@ import { SyllabusModel } from "../../db/models/syllabus.js";
 import { chatBotService } from "../../utils/apiKey/api.key.js";
 import { asyncHandler } from "../../utils/errors/async.handler.js";
 import { extractJson } from "../../utils/extractContent.js";
+import { roles } from "../../utils/global/enums.js";
 import { successResponse } from "../../utils/success/success.response.js";
 
 function cleanText(text) {
@@ -73,8 +74,13 @@ export const getCourse = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllCourse = asyncHandler(async (req, res, next) => {
-  let courses = await CourseModel.find().select("-contentStructure");
-
+  let courses=[]
+  if(req.authUser.role==roles.teacher){
+   courses = await CourseModel.find({createdBy:req.authUser._id}).select("-contentStructure");
+  }
+  if(req.authUser.role==roles.student){
+      courses = await CourseModel.find().select("-contentStructure");
+  }
   successResponse({ res, message: "done", data: courses });
 });
 
